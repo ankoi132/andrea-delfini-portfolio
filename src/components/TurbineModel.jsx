@@ -316,10 +316,6 @@ export default function TurbineModel({
             key={`comp-stage-${stageIdx}`}
             ref={(el) => (compressorStagesRefs.current[stageIdx] = el)}
             position={[0, 0, cfg.z]}
-            onClick={(e) => {
-              e.stopPropagation()
-              onSelectStage('compressor')
-            }}
           >
             {/* Rotor Disc Rim with fir-tree slots (aligned in XY plane, depth along Z) */}
             <mesh geometry={disc} material={materials.titanium} position={[0, 0, -0.08]} castShadow />
@@ -349,10 +345,6 @@ export default function TurbineModel({
             key={`turb-stage-${stageIdx}`}
             ref={(el) => (turbineStagesRefs.current[stageIdx] = el)}
             position={[0, 0, cfg.z]}
-            onClick={(e) => {
-              e.stopPropagation()
-              onSelectStage('turbine')
-            }}
           >
             {/* Turbine Rotor Disc Rim */}
             <mesh geometry={disc} material={materials.inconel} position={[0, 0, -0.1]} castShadow />
@@ -381,10 +373,6 @@ export default function TurbineModel({
       <group
         ref={igvGroupRef}
         position={[0, 0, -2.6]}
-        onClick={(e) => {
-          e.stopPropagation()
-          onSelectStage('igv')
-        }}
       >
         {/* Aerodynamic Intake Bullet Nosecone pointing along -Z */}
         <mesh
@@ -415,12 +403,7 @@ export default function TurbineModel({
       </group>
 
       {/* ─── CAN-ANNULAR COMBUSTOR SECTION (8 CANS WITH FLAME) ───────────────── */}
-      <group
-        onClick={(e) => {
-          e.stopPropagation()
-          onSelectStage('combustor')
-        }}
-      >
+      <group>
         {Array.from({ length: COMBUSTOR_CANS_COUNT }, (_, idx) => {
           const angle = (idx / COMBUSTOR_CANS_COUNT) * Math.PI * 2
           const cx = Math.cos(angle) * COMBUSTOR_RADIUS
@@ -473,10 +456,6 @@ export default function TurbineModel({
       <group
         ref={exhaustGroupRef}
         position={[0, 0, 2.3]}
-        onClick={(e) => {
-          e.stopPropagation()
-          onSelectStage('exhaust')
-        }}
       >
         {/* Central Aerodynamic Exhaust Tailcone pointing aft (+Z) */}
         <mesh

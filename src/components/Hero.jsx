@@ -7,45 +7,33 @@ export default function Hero() {
   const [mode, setMode] = useState('nominal')
   const [explosionAmount, setExplosionAmount] = useState(0.85)
   const [activeStage, setActiveStage] = useState(null)
+  const [zoomDelta, setZoomDelta] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
 
-  const nameRef = useRef()
-  const titleRef = useRef()
-  const descRef = useRef()
-  const ctaGroupRef = useRef()
+  const heroCardRef = useRef()
   const navRef = useRef()
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024)
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
     tl.fromTo(
       navRef.current,
-      { opacity: 0, y: -20 },
-      { opacity: 1, y: 0, duration: 0.8 },
+      { opacity: 0, y: -15 },
+      { opacity: 1, y: 0, duration: 0.7 },
       0.1
     )
     tl.fromTo(
-      nameRef.current,
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 1 },
-      0.4
-    )
-    tl.fromTo(
-      titleRef.current,
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.8 },
-      0.7
-    )
-    tl.fromTo(
-      descRef.current,
-      { opacity: 0, y: 15 },
-      { opacity: 1, y: 0, duration: 0.8 },
-      1.0
-    )
-    tl.fromTo(
-      ctaGroupRef.current,
-      { opacity: 0, y: 15 },
-      { opacity: 1, y: 0, duration: 0.8 },
-      1.2
+      heroCardRef.current,
+      { opacity: 0, y: 25 },
+      { opacity: 1, y: 0, duration: 0.9 },
+      0.3
     )
 
     return () => tl.kill()
@@ -57,13 +45,13 @@ export default function Hero() {
         position: 'relative',
         width: '100%',
         height: '100vh',
-        minHeight: '750px',
+        minHeight: isMobile ? '640px' : '720px',
         overflow: 'hidden',
-        background: 'radial-gradient(ellipse at 60% 40%, #0d1624 0%, #070a0f 70%)',
+        background: 'radial-gradient(ellipse at 65% 45%, #0e1726 0%, #070a0f 75%)',
       }}
     >
-      {/* ─── TOP NAVIGATION BAR ───────────────────────────────────────────── */}
-      <nav
+      {/* ─── TOP NAVIGATION BAR (CLEAN, NO OVERLAPPING ELEMENTS) ───────────── */}
+      <header
         ref={navRef}
         style={{
           position: 'absolute',
@@ -71,41 +59,85 @@ export default function Hero() {
           left: 0,
           right: 0,
           zIndex: 25,
-          padding: '24px clamp(20px, 4vw, 48px)',
+          height: '64px',
+          padding: '0 clamp(16px, 4vw, 36px)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           pointerEvents: 'none',
         }}
       >
-        <div style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span
-            className="font-mono"
+        {/* Brand Monogram + Title */}
+        <div
+          style={{
+            pointerEvents: 'auto',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <div
             style={{
+              width: '34px',
+              height: '34px',
+              borderRadius: '6px',
+              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(255, 107, 43, 0.2))',
+              border: '1px solid var(--border-active)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
               fontSize: '0.85rem',
-              fontWeight: 700,
-              color: '#38bdf8',
-              letterSpacing: '0.06em',
+              color: '#f8fafc',
+              flexShrink: 0,
             }}
           >
-            ANDREA DELFINI // TURBOMACHINERY
-          </span>
+            AD
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 700, fontSize: '0.92rem', color: '#f1f5f9' }}>
+                Andrea Delfini
+              </span>
+              <span
+                className="pulse-indicator"
+                style={{ background: '#38bdf8' }}
+                title="Disponibile per Consulenze"
+              />
+            </div>
+            <div
+              className="font-mono"
+              style={{
+                fontSize: '0.65rem',
+                color: '#94a3b8',
+                display: window.innerWidth < 480 ? 'none' : 'block',
+              }}
+            >
+              Turbomacchine & Generatori di Potenza
+            </div>
+          </div>
         </div>
 
+        {/* Navigation Links + CTA */}
         <div
           className="hud-panel"
           style={{
             pointerEvents: 'auto',
-            padding: '6px 14px',
+            padding: '5px 12px',
             display: 'flex',
-            gap: '20px',
+            gap: '16px',
             alignItems: 'center',
           }}
         >
           <a
             href="#competenze"
             className="font-mono"
-            style={{ fontSize: '0.75rem', color: '#94a3b8', transition: 'color 0.2s' }}
+            style={{
+              fontSize: '0.75rem',
+              color: '#94a3b8',
+              display: isMobile ? 'none' : 'inline',
+              transition: 'color 0.2s',
+            }}
             onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
             onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
           >
@@ -114,7 +146,12 @@ export default function Hero() {
           <a
             href="#casi-studio"
             className="font-mono"
-            style={{ fontSize: '0.75rem', color: '#94a3b8', transition: 'color 0.2s' }}
+            style={{
+              fontSize: '0.75rem',
+              color: '#94a3b8',
+              display: isMobile ? 'none' : 'inline',
+              transition: 'color 0.2s',
+            }}
             onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
             onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
           >
@@ -125,10 +162,10 @@ export default function Hero() {
             className="tech-btn tech-btn-primary"
             style={{ padding: '6px 12px', fontSize: '0.72rem' }}
           >
-            Consulenza
+            Contatto
           </a>
         </div>
-      </nav>
+      </header>
 
       {/* ─── 3D TURBINE CANVAS CENTERPIECE ───────────────────────────────── */}
       <div
@@ -142,7 +179,7 @@ export default function Hero() {
           mode={mode}
           explosionAmount={explosionAmount}
           activeStage={activeStage}
-          onSelectStage={(stageId) => setActiveStage(stageId)}
+          zoomDelta={zoomDelta}
         />
       </div>
 
@@ -154,92 +191,108 @@ export default function Hero() {
         setExplosionAmount={setExplosionAmount}
         activeStage={activeStage}
         setActiveStage={setActiveStage}
+        zoomDelta={zoomDelta}
+        setZoomDelta={setZoomDelta}
       />
 
-      {/* ─── HERO EDITORIAL OVERLAY (BOTTOM-LEFT / CENTER-LEFT) ──────────── */}
+      {/* ─── HERO EDITORIAL CARD (DESKTOP: LEFT COLUMN | MOBILE: TOP ANCHOR) */}
       <div
-        style={{
-          position: 'absolute',
-          top: '120px',
-          left: 'clamp(20px, 4vw, 48px)',
-          zIndex: 10,
-          maxWidth: '560px',
-          pointerEvents: 'none',
-        }}
+        ref={heroCardRef}
+        style={
+          isMobile
+            ? {
+                position: 'absolute',
+                top: '72px',
+                left: '16px',
+                right: '16px',
+                zIndex: 10,
+                pointerEvents: 'none',
+              }
+            : {
+                position: 'absolute',
+                top: '84px',
+                left: 'clamp(24px, 4vw, 56px)',
+                width: 'clamp(340px, 32vw, 460px)',
+                zIndex: 10,
+                pointerEvents: 'none',
+              }
+        }
       >
+        {/* Category Pill */}
         <div
-          ref={nameRef}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(7, 10, 15, 0.7)',
+            gap: '6px',
+            background: 'rgba(7, 10, 15, 0.75)',
             backdropFilter: 'blur(10px)',
-            padding: '6px 12px',
+            padding: '4px 10px',
             borderRadius: '4px',
             border: '1px solid var(--border-subtle)',
-            marginBottom: '14px',
+            marginBottom: '10px',
           }}
         >
           <span
             className="font-mono"
             style={{
-              fontSize: '0.72rem',
+              fontSize: '0.65rem',
               color: '#38bdf8',
-              letterSpacing: '0.08em',
+              letterSpacing: '0.06em',
               textTransform: 'uppercase',
             }}
           >
-            Senior Power Plant & Turbomachinery Specialist
+            Heavy Turbomachinery Specialist
           </span>
         </div>
 
+        {/* Name Title */}
         <h1
-          ref={titleRef}
           style={{
-            fontSize: 'clamp(2.4rem, 5vw, 4.2rem)',
+            fontSize: isMobile ? 'clamp(1.8rem, 6vw, 2.5rem)' : 'clamp(2.4rem, 4vw, 3.6rem)',
             fontWeight: 800,
             letterSpacing: '-0.03em',
             lineHeight: 1.05,
             color: '#ffffff',
-            margin: '0 0 16px',
-            textShadow: '0 4px 30px rgba(0, 0, 0, 0.7)',
+            margin: '0 0 10px',
+            textShadow: '0 4px 20px rgba(0, 0, 0, 0.8)',
           }}
         >
           Andrea Delfini
         </h1>
 
+        {/* Subtitle */}
         <p
-          ref={descRef}
           style={{
-            fontSize: 'clamp(0.95rem, 1.6vw, 1.12rem)',
+            fontSize: isMobile ? '0.86rem' : '0.96rem',
             color: '#cbd5e1',
-            lineHeight: 1.6,
-            marginBottom: '28px',
-            textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)',
-            background: 'rgba(7, 10, 15, 0.5)',
+            lineHeight: 1.55,
+            marginBottom: '16px',
+            textShadow: '0 2px 10px rgba(0, 0, 0, 0.9)',
+            background: 'rgba(7, 10, 15, 0.55)',
             backdropFilter: 'blur(8px)',
-            padding: '12px 16px',
+            padding: '10px 14px',
             borderRadius: '6px',
             border: '1px solid var(--border-subtle)',
+            maxWidth: '100%',
           }}
         >
-          Progettazione aerotermica, diagnostica rotodinamica su cuscinetti fluidodinamici e transizione H2-Ready per grandi gruppi turbo-generatori industriali.
+          Ingegnere specialista in progettazione aerotermica, diagnostica rotodinamica su cuscinetti fluidodinamici e transizione H2-Ready per gruppi turbo-generatori.
         </p>
 
+        {/* Action CTAs */}
         <div
-          ref={ctaGroupRef}
           style={{
             display: 'flex',
             flexWrap: 'wrap',
-            gap: '14px',
+            gap: '10px',
+            marginBottom: '16px',
             pointerEvents: 'auto',
           }}
         >
           <a
             href="#contatto"
             className="tech-btn tech-btn-flame"
-            style={{ padding: '12px 24px', fontSize: '0.85rem' }}
+            style={{ padding: '9px 18px', fontSize: '0.8rem' }}
           >
             Richiedi Perizia Tecnica →
           </a>
@@ -249,10 +302,56 @@ export default function Hero() {
               setExplosionAmount(0.9)
             }}
             className="tech-btn tech-btn-secondary"
-            style={{ padding: '12px 20px', fontSize: '0.85rem' }}
+            style={{ padding: '9px 16px', fontSize: '0.8rem' }}
           >
-            Esploso Scientifico 3D
+            Esploso 3D
           </button>
+        </div>
+
+        {/* ─── LIVE TELEMETRY CARD (DOCKED IN THE HERO COLUMN - ZERO OVERLAP) ── */}
+        <div
+          className="hud-panel"
+          style={{
+            padding: '10px 14px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '8px',
+            pointerEvents: 'auto',
+            background: 'rgba(10, 15, 23, 0.85)',
+          }}
+        >
+          <div>
+            <div className="font-mono" style={{ fontSize: '0.58rem', color: '#64748b', textTransform: 'uppercase' }}>
+              Rotore
+            </div>
+            <div className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#38bdf8' }}>
+              3,000 <span style={{ fontSize: '0.58rem', fontWeight: 400, color: '#94a3b8' }}>RPM</span>
+            </div>
+          </div>
+          <div>
+            <div className="font-mono" style={{ fontSize: '0.58rem', color: '#64748b', textTransform: 'uppercase' }}>
+              Rapporto
+            </div>
+            <div className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9' }}>
+              24.2 : 1
+            </div>
+          </div>
+          <div>
+            <div className="font-mono" style={{ fontSize: '0.58rem', color: '#64748b', textTransform: 'uppercase' }}>
+              Temp (TIT)
+            </div>
+            <div className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ff6b2b' }}>
+              1,480 <span style={{ fontSize: '0.58rem', fontWeight: 400, color: '#94a3b8' }}>°C</span>
+            </div>
+          </div>
+          <div>
+            <div className="font-mono" style={{ fontSize: '0.58rem', color: '#64748b', textTransform: 'uppercase' }}>
+              Potenza
+            </div>
+            <div className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f59e0b' }}>
+              380 <span style={{ fontSize: '0.58rem', fontWeight: 400, color: '#94a3b8' }}>MW</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

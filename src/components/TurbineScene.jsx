@@ -1,7 +1,8 @@
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
-import { Suspense, useMemo } from 'react'
+import { Suspense, useEffect, useState, useRef } from 'react'
+import * as THREE from 'three'
 import TurbineModel from './TurbineModel.jsx'
 import Particles from './Particles.jsx'
 
@@ -55,23 +56,58 @@ function Lights({ mode }) {
   )
 }
 
+function ResponsiveCamera({ zoomDelta = 0 }) {
+  const { camera } = useThree()
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth
+      if (w < 768) {
+        // Mobile: centered, farther away to fit entire machine vertically
+        camera.position.set(-4.6, 2.6, 7.8 + zoomDelta)
+        camera.fov = 48
+      } else if (w < 1024) {
+        // Tablet
+        camera.position.set(-4.0, 2.2, 6.2 + zoomDelta)
+        camera.fov = 44
+      } else {
+        // Desktop: offset slightly to the right to leave space for left hero text
+        camera.position.set(-3.5, 1.9, 5.2 + zoomDelta)
+        camera.fov = 42
+      }
+      camera.updateProjectionMatrix()
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [camera, zoomDelta])
+
+  return null
+}
+
 export default function TurbineScene({
   mode = 'nominal',
   explosionAmount = 0,
   activeStage = null,
-  onSelectStage = () => {},
+  zoomDelta = 0,
 }) {
-  const isMobile = useMemo(() => {
-    return (
-      typeof window !== 'undefined' &&
-      (window.innerWidth < 768 || 'ontouchstart' in window)
-    )
+  const [isMobile, setIsMobile] = useState(false)
+  const controlsRef = useRef()
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   return (
     <Canvas
       camera={{
-        position: isMobile ? [-4.5, 2.5, 6.2] : [-3.8, 2.2, 5.2],
+        position: [-3.8, 2.2, 5.4],
         fov: 42,
         near: 0.1,
         far: 100,
@@ -84,8 +120,14 @@ export default function TurbineScene({
         toneMappingExposure: 1.1,
       }}
       shadows
-      style={{ background: 'transparent' }}
+      style={{
+        background: 'transparent',
+        width: '100%',
+        height: '100%',
+        touchAction: 'pan-y', // Allows native vertical page scrolling on touch devices!
+      }}
     >
+      <ResponsiveCamera zoomDelta={zoomDelta} />
       <Lights mode={mode} />
 
       <Suspense fallback={null}>
@@ -93,28 +135,32 @@ export default function TurbineScene({
           mode={mode}
           explosionAmount={explosionAmount}
           activeStage={activeStage}
-          onSelectStage={onSelectStage}
         />
         <Particles mode={mode} />
 
         <EffectComposer>
           <Bloom
-            intensity={0.9}
-            luminanceThreshold={0.45}
+            intensity={0.85}
+            luminanceThreshold={0.48}
             luminanceSmoothing={0.8}
             radius={0.65}
           />
         </EffectComposer>
       </Suspense>
 
+      {/* OrbitControls:
+          CRITICAL FIX: enableZoom={false} prevents wheel hijack!
+          Rolling mouse wheel scrolls the page down smoothly without getting trapped.
+          Left-click drag rotates the turbine freely.
+      */}
       <OrbitControls
-        enableZoom={true}
+        ref={controlsRef}
+        enableZoom={false}
         enablePan={false}
         enableRotate={true}
         dampingFactor={0.06}
         enableDamping
-        minDistance={3.2}
-        maxDistance={11.0}
+        target={isMobile ? [0, 0, 0] : [0.5, 0, 0]}
         minPolarAngle={Math.PI / 4}
         maxPolarAngle={Math.PI / 1.7}
       />
