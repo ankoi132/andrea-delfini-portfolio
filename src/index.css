@@ -1,11 +1,23 @@
 :root {
-  --color-bg: #0a0a0a;
-  --color-steel: #8b9bb4;
-  --color-blue: #0099ff;
-  --color-blue-bright: #00d4ff;
-  --color-text: #e8eaf0;
-  --color-text-muted: #6b7a99;
-  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --bg-primary: #070a0f;
+  --bg-secondary: #0d1219;
+  --bg-card: rgba(15, 21, 30, 0.85);
+  --bg-card-hover: rgba(22, 31, 45, 0.95);
+  --border-subtle: rgba(148, 163, 184, 0.12);
+  --border-strong: rgba(148, 163, 184, 0.25);
+  --border-active: rgba(56, 189, 248, 0.45);
+  
+  --accent-cyan: #38bdf8;
+  --accent-flame: #ff6b2b;
+  --accent-gold: #f59e0b;
+  --accent-glow: rgba(56, 189, 248, 0.15);
+  
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
 *,
@@ -18,49 +30,135 @@
 
 html {
   scroll-behavior: smooth;
+  color-scheme: dark;
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-main);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.6;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
+/* Subtle blueprint background grid */
+.engineering-grid {
+  background-image: 
+    linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Custom technical scrollbar */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #111;
+  background: var(--bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-blue);
-  border-radius: 2px;
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-blue-bright);
+  background: var(--accent-cyan);
 }
 
-/* Firefox scrollbar */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-blue) #111;
+/* Monospace telemetry text utility */
+.font-mono {
+  font-family: var(--font-mono);
 }
 
-a {
-  color: inherit;
+/* Interactive button effects */
+.tech-btn {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 10px 18px;
+  border-radius: 4px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
   text-decoration: none;
 }
 
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-  font-family: var(--font-main);
+.tech-btn-primary {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(56, 189, 248, 0.05));
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
+}
+
+.tech-btn-primary:hover {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+  transform: translateY(-1px);
+}
+
+.tech-btn-flame {
+  background: linear-gradient(135deg, rgba(255, 107, 43, 0.2), rgba(255, 107, 43, 0.05));
+  border: 1px solid rgba(255, 107, 43, 0.5);
+  color: #ff854d;
+  box-shadow: 0 0 15px rgba(255, 107, 43, 0.15);
+}
+
+.tech-btn-flame:hover {
+  background: rgba(255, 107, 43, 0.3);
+  border-color: #ff6b2b;
+  color: #ffffff;
+  box-shadow: 0 0 24px rgba(255, 107, 43, 0.35);
+  transform: translateY(-1px);
+}
+
+.tech-btn-secondary {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.tech-btn-secondary:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  background: rgba(30, 41, 59, 0.7);
+}
+
+/* Glass panel */
+.hud-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Pulse animation for active telemetry */
+@keyframes telemetryPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+}
+
+.pulse-indicator {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  animation: telemetryPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
